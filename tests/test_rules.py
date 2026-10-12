@@ -135,3 +135,18 @@ def test_unused_exception_is_reported_as_stale():
     allowed = Allowance(rule="entity-data", file="gone.java", match="@Data", reason="옛 예외")
 
     assert check([], Config(allowances=[allowed])).stale_exceptions == [allowed]
+
+
+def test_todo_comment_is_allowed():
+    files = [
+        java("common/U.java", "// TODO(임시): 확장 ID 로 좁힐 것", "int a = 1; // TODO 정리", "// todo 소문자"),
+        file("application.yml", "  # TODO(임시): 로컬 FE 개발용"),
+    ]
+
+    assert hits(*files) == [("new-comment", files[0].path, 3)]
+
+
+def test_todo_inside_block_comment_allows_only_that_line():
+    block = java("common/U.java", "/**", " * TODO 정리", " */")
+
+    assert [line for _, _, line in hits(block)] == [1, 3]

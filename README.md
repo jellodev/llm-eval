@@ -7,7 +7,7 @@ Java(Spring) 프로젝트를 정적 규칙으로 채점하는 CLI. LLM 이 만�
 ## 실행
 
 ```bash
-uvx --from git+https://github.com/jellodev/llm-eval@v0.1.0 llm-eval --root path/to/project
+uvx --from git+https://github.com/jellodev/llm-eval@v0.2.0 llm-eval --root path/to/project
 ```
 
 - 결과는 JSON 으로 stdout 에 출력되고, 위반이 있으면 종료 코드는 `1` 이다.
@@ -19,7 +19,7 @@ uvx --from git+https://github.com/jellodev/llm-eval@v0.1.0 llm-eval --root path/
 |---|---|
 | `entity-data` | `@Entity` 클래스에 `@Data` |
 | `transactional-outside-application` | `src/main/java` 에서 트랜잭션 레이어 패키지 밖의 `@Transactional` (`@TransactionalEventListener` 제외) |
-| `new-comment` | 주석 줄 (Java·Gradle·SQL·YAML·properties·TOML·shell·Python, shebang 제외) |
+| `new-comment` | 주석 줄 (Java·Gradle·SQL·YAML·properties·TOML·shell·Python). shebang 과 대문자 `TODO` 가 들어간 줄은 허용 |
 | `migration-pair` | 같은 디렉터리에 짝이 없는 `*.up.sql` / `*.down.sql` |
 
 주석은 언어별 lexer 로 판정한다. 주석 안에 적힌 `@Transactional` 같은 텍스트는 코드 규칙에 걸리지 않는다.

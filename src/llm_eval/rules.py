@@ -34,6 +34,7 @@ MIGRATION = re.compile(r"^(.+)\.(up|down)\.sql$")
 ENTITY = re.compile(r"^\s*@Entity\b")
 DATA = re.compile(r"^\s*@Data\b")
 TRANSACTIONAL = re.compile(r"^\s*@Transactional\b")
+TODO = re.compile(r"\bTODO\b")
 
 
 def _code_lines(file: SourceFile) -> Iterator[tuple[int, str]]:
@@ -68,7 +69,9 @@ def transactional_outside_application(files: list[SourceFile], config: Config) -
 def new_comment(files: list[SourceFile], config: Config) -> Iterator[Violation]:
     for file in files:
         for number in sorted(comment_lines(file.path, file.lines)):
-            yield Violation("new-comment", file.path, number, file.lines[number - 1].strip())
+            text = file.lines[number - 1]
+            if not TODO.search(text):
+                yield Violation("new-comment", file.path, number, text.strip())
 
 
 def migration_pair(files: list[SourceFile], config: Config) -> Iterator[Violation]:
