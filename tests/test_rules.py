@@ -23,16 +23,6 @@ def rules_hit(*files, config=Config()):
     return sorted({rule for rule, _, _ in hits(*files, config=config)})
 
 
-def test_data_on_entity_is_violation():
-    entity = java("order/adapter/out/persistence/Order.java", "@Entity", "@Data", "class Order {}")
-
-    assert hits(entity) == [("entity-data", entity.path, 2)]
-
-
-def test_data_on_non_entity_is_allowed():
-    assert rules_hit(java("order/adapter/in/web/OrderDto.java", "@Data", "class OrderDto {}")) == []
-
-
 def test_transactional_outside_application_is_violation():
     store = java("order/adapter/out/OrderStore.java", "  @Transactional(readOnly = true)")
 
@@ -132,7 +122,7 @@ def test_exception_moves_matching_violation_to_excepted():
 
 
 def test_unused_exception_is_reported_as_stale():
-    allowed = Allowance(rule="entity-data", file="gone.java", match="@Data", reason="옛 예외")
+    allowed = Allowance(rule="migration-pair", file="gone.up.sql", match="down.sql 짝 없음", reason="옛 예외")
 
     assert check([], Config(allowances=[allowed])).stale_exceptions == [allowed]
 

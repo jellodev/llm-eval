@@ -31,7 +31,6 @@ def test_clean_tree_passes_with_all_rules_by_default(tmp_path, capsys):
     assert report["passed"] is True
     assert report["summary"] == {}
     assert report["rules"] == [
-        "entity-data",
         "transactional-outside-application",
         "transactional-self-invocation",
         "new-comment",

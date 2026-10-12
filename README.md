@@ -19,7 +19,6 @@ uvx --from git+https://github.com/jellodev/llm-eval@<태그> llm-eval --root pat
 
 | 규칙 | 위반 조건 |
 |---|---|
-| `entity-data` | `@Entity` 클래스에 `@Data` |
 | `transactional-outside-application` | `src/main/java` 에서 트랜잭션 레이어 패키지 밖의 `@Transactional` (`@TransactionalEventListener` 제외) |
 | `transactional-self-invocation` | 같은 클래스 안에서 `@Transactional` 메서드를 `x()`·`this.x()`·`this::x` 로 호출하는데, 호출하는 쪽에 트랜잭션이 없거나, 호출받는 쪽이 새 트랜잭션(`REQUIRES_NEW`·`NOT_SUPPORTED`·`NESTED`·`NEVER`)을 요구하거나, `readOnly` 안에서 쓰기 트랜잭션을 부르는 경우. 프록시를 거치지 않아 트랜잭션 설정이 무시된다 |
 | `new-comment` | 주석 줄 (Java·Gradle·SQL·YAML·properties·TOML·shell·Python). shebang 과 대문자 `TODO` 가 들어간 줄은 허용 |
@@ -34,7 +33,7 @@ uvx --from git+https://github.com/jellodev/llm-eval@<태그> llm-eval --root pat
 프로젝트 루트의 `llm-eval.toml` 을 읽는다(`--config` 로 다른 경로 지정 가능). 파일이 없으면 전체 규칙과 기본값으로 검사한다.
 
 ```toml
-rules = ["entity-data", "transactional-outside-application", "migration-pair"]
+rules = ["transactional-outside-application", "migration-pair"]
 transaction_layer = "application"
 
 [[exception]]

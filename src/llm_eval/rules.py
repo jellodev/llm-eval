@@ -32,8 +32,6 @@ class Report:
 
 JAVA_MAIN = "src/main/java/"
 MIGRATION = re.compile(r"^(.+)\.(up|down)\.sql$")
-ENTITY = re.compile(r"^\s*@Entity\b")
-DATA = re.compile(r"^\s*@Data\b")
 TRANSACTIONAL = re.compile(r"^\s*@Transactional\b")
 TODO = re.compile(r"\bTODO\b")
 
@@ -47,15 +45,6 @@ def _code_lines(file: SourceFile) -> Iterator[tuple[int, str]]:
 
 def _is_main_java(file: SourceFile) -> bool:
     return file.path.startswith(JAVA_MAIN) and file.path.endswith(".java")
-
-
-def entity_data(files: list[SourceFile], config: Config) -> Iterator[Violation]:
-    for file in filter(_is_main_java, files):
-        code = list(_code_lines(file))
-        if any(ENTITY.match(text) for _, text in code):
-            for number, text in code:
-                if DATA.match(text):
-                    yield Violation("entity-data", file.path, number, text.strip())
 
 
 def transactional_outside_application(files: list[SourceFile], config: Config) -> Iterator[Violation]:
@@ -97,7 +86,6 @@ def migration_pair(files: list[SourceFile], config: Config) -> Iterator[Violatio
 
 
 RULES: dict[str, Callable[[list[SourceFile], Config], Iterator[Violation]]] = {
-    "entity-data": entity_data,
     "transactional-outside-application": transactional_outside_application,
     "transactional-self-invocation": transactional_self_invocation,
     "new-comment": new_comment,
