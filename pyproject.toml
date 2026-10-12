@@ -1,6 +1,6 @@
 [project]
 name = "llm-eval"
-version = "0.2.0"
+version = "0.3.0"
 description = "Java 프로젝트 규칙 기반 채점기 — LLM 산출물과 코드베이스를 정적 규칙으로 검사"
 requires-python = ">=3.12"
 dependencies = []
