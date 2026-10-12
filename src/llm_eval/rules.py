@@ -5,6 +5,7 @@ from pathlib import PurePosixPath
 
 from llm_eval.comments import comment_lines
 from llm_eval.config import Allowance, Config
+from llm_eval.java_structure import blank_comments_and_strings, self_invocations
 
 
 @dataclass(frozen=True)
@@ -74,6 +75,14 @@ def new_comment(files: list[SourceFile], config: Config) -> Iterator[Violation]:
                 yield Violation("new-comment", file.path, number, text.strip())
 
 
+def transactional_self_invocation(files: list[SourceFile], config: Config) -> Iterator[Violation]:
+    for file in filter(_is_main_java, files):
+        code = blank_comments_and_strings("\n".join(file.lines))
+        for position in self_invocations(code):
+            number = code.count("\n", 0, position) + 1
+            yield Violation("transactional-self-invocation", file.path, number, file.lines[number - 1].strip())
+
+
 def migration_pair(files: list[SourceFile], config: Config) -> Iterator[Violation]:
     migrations = {}
     for file in files:
@@ -90,6 +99,7 @@ def migration_pair(files: list[SourceFile], config: Config) -> Iterator[Violatio
 RULES: dict[str, Callable[[list[SourceFile], Config], Iterator[Violation]]] = {
     "entity-data": entity_data,
     "transactional-outside-application": transactional_outside_application,
+    "transactional-self-invocation": transactional_self_invocation,
     "new-comment": new_comment,
     "migration-pair": migration_pair,
 }
