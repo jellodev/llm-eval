@@ -4,6 +4,8 @@ Java(Spring) 프로젝트를 정적 규칙으로 채점하는 CLI. LLM 이 만�
 
 변경분(diff)이 아니라 **git 추적 파일 + gitignore 되지 않은 새 파일 전체**를 검사한다. 변경분만 보면 기존 위반이 숨기 때문이다.
 
+규칙 채점 다음 단계(골든 과제·Judge)의 계획은 [ROADMAP.md](ROADMAP.md).
+
 ## 실행
 
 ```bash
