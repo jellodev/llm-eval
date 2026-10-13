@@ -1,6 +1,6 @@
 [project]
 name = "llm-eval"
-version = "0.4.0"
+version = "0.4.1"
 description = "LLM 산출물 채점기 — Java 프로젝트 규칙 검사와 골드 라벨로 보정하는 LLM Judge"
 requires-python = ">=3.12"
 dependencies = []

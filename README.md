@@ -76,7 +76,7 @@ Judge 는 `claude -p` 를 도구 없이(`--tools ""`), 설정·CLAUDE.md 를 읽
 
 - `[judge] context` 에 적은 파일의 **커밋 직전(`<sha>^`) 내용** — 나중에 생긴 규칙으로 과거 커밋을 판정하지 않도록
 - 커밋 메시지
-- 커밋 diff (`[judge] exclude` 패턴 제외)
+- 변경 파일 목록과 커밋 diff. `[judge] exclude` 패턴에 맞는 파일은 목록에 `(내용 생략)` 으로만 보이고 diff 에서 빠진다 — 생성물이 바뀌었다는 사실까지 숨기면 "재생성 누락" 오판이 난다
 
 ```toml
 [judge]
