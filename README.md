@@ -60,6 +60,34 @@ reason = "유스케이스 없이 어댑터가 직접 호출하는 행 락 경계
 }
 ```
 
+## Judge (3단계)
+
+규칙으로 가를 수 없는 결함을 LLM Judge 로 판정하고, 사람 라벨(골드 라벨)과의 일치율을 잰다. 판정 결과로 PR 을 막지 않는다 — 일치율이 측정되지 않은 Judge 점수는 쓰지 않는다([ROADMAP](ROADMAP.md)).
+
+```bash
+llm-eval judge --set eval/gold.json --rubric eval/rubric.md --out eval/runs/v1
+```
+
+- `--set` — 표본 목록 `[{"id": "31", "sha": "<커밋>", "label": "정상" | "결함" | null}]`. `label` 이 없는 표본은 판정만 하고 일치율에서 뺀다.
+- `--rubric` — Judge 의 시스템 프롬프트. 항목별 판정(`items`)과 최종 `verdict`(`정상`·`결함`)·`reason` 을 JSON 으로 받는다.
+- `--out` — 표본별 판정(`<id>.json`)과 `summary.json`. 같은 sha 의 판정이 이미 있으면 다시 부르지 않는다.
+
+Judge 는 `claude -p` 를 도구 없이(`--tools ""`), 설정·CLAUDE.md 를 읽지 않게(`--setting-sources ""`) 빈 임시 디렉터리에서 부른다. 보는 것은 다음 세 가지뿐이다.
+
+- `[judge] context` 에 적은 파일의 **커밋 직전(`<sha>^`) 내용** — 나중에 생긴 규칙으로 과거 커밋을 판정하지 않도록
+- 커밋 메시지
+- 커밋 diff (`[judge] exclude` 패턴 제외)
+
+```toml
+[judge]
+context = ["CLAUDE.md", "backend/CLAUDE.md"]
+exclude = ["**/openapi.json"]
+model = "sonnet"
+timeout_seconds = 600
+```
+
+`context` 경로는 저장소 루트 기준이다. 출력은 혼동표(`tp`·`fn`·`fp`·`tn`, 결함이 양성), 정확도, Cohen κ, 비용, 사람과 다른 판정 목록(`disagreements`), 실패 목록(`failed`)이다. 판정에 실패한 표본이 있으면 종료 코드는 `1` 이다.
+
 ## 개발
 
 ```bash

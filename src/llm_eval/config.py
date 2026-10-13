@@ -14,10 +14,19 @@ class Allowance:
 
 
 @dataclass(frozen=True)
+class JudgeConfig:
+    context: tuple[str, ...] = ()
+    exclude: tuple[str, ...] = ()
+    model: str = "sonnet"
+    timeout_seconds: int = 600
+
+
+@dataclass(frozen=True)
 class Config:
     rules: tuple[str, ...] | None = None
     transaction_layer: str = "application"
     allowances: list[Allowance] = field(default_factory=list)
+    judge: JudgeConfig = field(default_factory=JudgeConfig)
 
 
 def load_config(path: Path) -> Config:
@@ -30,4 +39,14 @@ def load_config(path: Path) -> Config:
         rules=tuple(rules) if rules is not None else None,
         transaction_layer=data.get("transaction_layer", Config.transaction_layer),
         allowances=[Allowance(**entry) for entry in data.get("exception", [])],
+        judge=_judge_config(data.get("judge", {})),
+    )
+
+
+def _judge_config(data: dict) -> JudgeConfig:
+    return JudgeConfig(
+        context=tuple(data.get("context", ())),
+        exclude=tuple(data.get("exclude", ())),
+        model=data.get("model", JudgeConfig.model),
+        timeout_seconds=data.get("timeout_seconds", JudgeConfig.timeout_seconds),
     )
