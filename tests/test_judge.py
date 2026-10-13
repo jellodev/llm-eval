@@ -120,7 +120,11 @@ def test_judge_sees_rules_as_of_parent_commit_and_no_excluded_paths(fake_claude,
     assert "new rule added later" not in call["prompt"].split("## 커밋 메시지")[0]
     assert "feat: x" in call["prompt"]
     assert "src/x.txt" in call["prompt"]
-    assert "gen.json" not in call["prompt"]
+    files, diff = call["prompt"].split("## 변경 파일")[1].split("## diff")
+    assert "api/gen.json (내용 생략)" in files
+    assert "src/x.txt" in files and "src/x.txt (내용 생략)" not in files
+    assert "gen.json" not in diff
+    assert "generated" not in diff
     assert call["argv"][call["argv"].index("--tools") + 1] == ""
     assert call["argv"][call["argv"].index("--setting-sources") + 1] == ""
     assert call["argv"][call["argv"].index("--system-prompt") + 1] == "rubric text"

@@ -60,11 +60,18 @@ def build_prompt(repo: Path, sha: str, config: JudgeConfig) -> str:
     message = _git(repo, "show", "-s", "--format=%B", sha).stdout
     excludes = [f":(exclude){pattern}" for pattern in config.exclude]
     diff = _git(repo, "show", "--format=", sha, "--", ".", *excludes).stdout
+    omitted = set(_git(repo, "show", "--name-only", "--format=", sha, "--", *config.exclude).stdout.split()) if config.exclude else set()
+    changed = [
+        line.split("\t")[-1] + (" (내용 생략)" if line.split("\t")[-1] in omitted else "")
+        for line in _git(repo, "show", "--name-status", "--format=", sha).stdout.splitlines()
+        if line
+    ]
     rule_text = "\n\n".join(rules) if rules else "(없음)"
     return (
         f"## 프로젝트 규칙 (커밋 직전 시점)\n\n{rule_text}\n\n"
         f"## 커밋 메시지\n\n{message}\n\n"
-        f"## diff\n\n{diff}"
+        f"## 변경 파일\n\n" + "\n".join(changed) + "\n\n"
+        f"## diff (내용 생략 파일 제외)\n\n{diff}"
     )
 
 
